@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Svg, {
-  Polyline,
   Circle,
   Line,
   Text as SvgText,
@@ -18,10 +17,33 @@ interface Props {
   data: MoodEntry[];
 }
 
-const CHART_HEIGHT  = 160;
-const PAD           = { top: 16, bottom: 32, left: 28, right: 12 };
+const CHART_HEIGHT  = 180;
+const PAD           = { top: 20, bottom: 36, left: 32, right: 16 };
 const SCREEN_WIDTH  = Dimensions.get('window').width;
 const CHART_WIDTH   = SCREEN_WIDTH - 48; // parent has 24px padding each side
+
+/** Smooth cubic-bezier path through an array of points. */
+function buildSmoothPath(pts: { x: number; y: number }[]): string {
+  if (pts.length < 2) return '';
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 1; i < pts.length; i++) {
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const cpx = (p0.x + p1.x) / 2;
+    d += ` C ${cpx} ${p0.y} ${cpx} ${p1.y} ${p1.x} ${p1.y}`;
+  }
+  return d;
+}
+
+/** Close the smooth path down to the baseline for the gradient fill. */
+function buildSmoothAreaPath(
+  pts: { x: number; y: number }[],
+  baseline: number,
+): string {
+  if (pts.length < 2) return '';
+  const line = buildSmoothPath(pts);
+  return `${line} L ${pts[pts.length - 1].x} ${baseline} L ${pts[0].x} ${baseline} Z`;
+}
 
 export default function MoodTrendChart({ data }: Props) {
   const innerW = CHART_WIDTH - PAD.left - PAD.right;
@@ -36,16 +58,12 @@ export default function MoodTrendChart({ data }: Props) {
     });
   }, [data, innerW, innerH]);
 
-  const polylineStr = points.map((p) => `${p.x},${p.y}`).join(' ');
+  const smoothLinePath = useMemo(() => buildSmoothPath(points), [points]);
 
-  // Build a closed area path for the gradient fill
   const areaPath = useMemo(() => {
     if (points.length < 2) return '';
-    const bottom = PAD.top + innerH;
-    const first  = points[0];
-    const last   = points[points.length - 1];
-    const line   = points.map((p) => `${p.x},${p.y}`).join(' L ');
-    return `M ${first.x},${bottom} L ${line} L ${last.x},${bottom} Z`;
+    const baseline = PAD.top + innerH;
+    return buildSmoothAreaPath(points, baseline);
   }, [points, innerH]);
 
   if (data.length === 0) {
@@ -60,7 +78,8 @@ export default function MoodTrendChart({ data }: Props) {
     <Svg width={CHART_WIDTH} height={CHART_HEIGHT}>
       <Defs>
         <LinearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0%"   stopColor={theme.colors.primary} stopOpacity={0.18} />
+          <Stop offset="0%"   stopColor={theme.colors.primary} stopOpacity={0.30} />
+          <Stop offset="70%"  stopColor={theme.colors.primary} stopOpacity={0.08} />
           <Stop offset="100%" stopColor={theme.colors.primary} stopOpacity={0}    />
         </LinearGradient>
       </Defs>
@@ -95,29 +114,24 @@ export default function MoodTrendChart({ data }: Props) {
         <Path d={areaPath} fill="url(#areaGrad)" />
       ) : null}
 
-      {/* Line */}
-      {points.length > 1 && (
-        <Polyline
-          points={polylineStr}
+      {/* Smooth line */}
+      {smoothLinePath ? (
+        <Path
+          d={smoothLinePath}
           fill="none"
           stroke={theme.colors.primary}
           strokeWidth={2.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-      )}
+      ) : null}
 
       {/* Data points */}
       {points.map((p, i) => (
-        <Circle
-          key={i}
-          cx={p.x}
-          cy={p.y}
-          r={5}
-          fill={theme.colors.mood[p.mood]}
-          stroke="white"
-          strokeWidth={1.5}
-        />
+        <React.Fragment key={i}>
+          <Circle cx={p.x} cy={p.y} r={7} fill={theme.colors.mood[p.mood]} opacity={0.15} />
+          <Circle cx={p.x} cy={p.y} r={5} fill={theme.colors.mood[p.mood]} stroke="white" strokeWidth={2} />
+        </React.Fragment>
       ))}
 
       {/* X-axis date labels — show first, last, and a few in between */}

@@ -1,14 +1,14 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { theme } from '../constants/theme';
 import type { MoodValue } from '../types';
 
 const MOODS: { value: MoodValue; emoji: string; label: string }[] = [
-  { value: 1, emoji: '😔', label: 'Very Low' },
-  { value: 2, emoji: '😕', label: 'Low'      },
-  { value: 3, emoji: '😐', label: 'Okay'     },
-  { value: 4, emoji: '🙂', label: 'Good'     },
-  { value: 5, emoji: '😊', label: 'Great'    },
+  { value: 1, emoji: '😔', label: 'Low'   },
+  { value: 2, emoji: '😕', label: 'Meh'   },
+  { value: 3, emoji: '😐', label: 'Okay'  },
+  { value: 4, emoji: '🙂', label: 'Good'  },
+  { value: 5, emoji: '😊', label: 'Great' },
 ];
 
 interface Props {
@@ -19,40 +19,65 @@ interface Props {
 
 export default function MoodPicker({ selected, onChange, size = 'md' }: Props) {
   const isSm = size === 'sm';
+  const scales = useRef(MOODS.map(() => new Animated.Value(1))).current;
+
+  function handlePress(mood: MoodValue, index: number) {
+    Animated.sequence([
+      Animated.spring(scales[index], {
+        toValue: 1.20,
+        useNativeDriver: true,
+        tension: 500,
+        friction: 8,
+      }),
+      Animated.spring(scales[index], {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 400,
+        friction: 10,
+      }),
+    ]).start();
+    onChange(mood);
+  }
 
   return (
     <View style={styles.row}>
-      {MOODS.map((m) => {
+      {MOODS.map((m, index) => {
         const isSelected = selected === m.value;
+        const moodColor  = theme.colors.mood[m.value];
         return (
-          <TouchableOpacity
+          <Animated.View
             key={m.value}
-            onPress={() => onChange(m.value)}
-            style={[
-              styles.item,
-              isSm && styles.itemSm,
-              isSelected && {
-                backgroundColor: theme.colors.mood[m.value] + '22',
-                borderColor: theme.colors.mood[m.value],
-                borderWidth: 2,
-              },
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={`Mood: ${m.label}`}
-            accessibilityState={{ selected: isSelected }}
+            style={[styles.itemWrap, { transform: [{ scale: scales[index] }] }]}
           >
-            <Text style={[styles.emoji, isSm && styles.emojiSm]}>{m.emoji}</Text>
-            {!isSm && (
-              <Text
-                style={[
-                  styles.label,
-                  isSelected && { color: theme.colors.mood[m.value], fontWeight: '600' },
-                ]}
-              >
-                {m.label}
-              </Text>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handlePress(m.value, index)}
+              style={[
+                styles.item,
+                isSm && styles.itemSm,
+                isSelected && {
+                  backgroundColor: moodColor + '26',
+                  borderColor:     moodColor,
+                  borderWidth:     2,
+                },
+              ]}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel={`Mood: ${m.label}`}
+              accessibilityState={{ selected: isSelected }}
+            >
+              <Text style={[styles.emoji, isSm && styles.emojiSm]}>{m.emoji}</Text>
+              {!isSm && (
+                <Text
+                  style={[
+                    styles.label,
+                    isSelected && { color: moodColor, fontWeight: '700' },
+                  ]}
+                >
+                  {m.label}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </Animated.View>
         );
       })}
     </View>
@@ -65,10 +90,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 6,
   },
+  itemWrap: { flex: 1 },
   item: {
-    flex: 1,
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 4,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1.5,
@@ -76,18 +101,19 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
   },
   itemSm: {
-    paddingVertical: 8,
+    paddingVertical: 9,
   },
   emoji: {
-    fontSize: 24,
-    marginBottom: 4,
+    fontSize: 28,
+    marginBottom: 5,
   },
   emojiSm: {
-    fontSize: 22,
+    fontSize: 24,
     marginBottom: 0,
   },
   label: {
     fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
     textAlign: 'center',
   },

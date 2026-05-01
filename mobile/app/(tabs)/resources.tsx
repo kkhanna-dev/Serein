@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { HOTLINES, ARTICLES, ORGANIZATIONS } from '../../constants/resources';
 import { theme } from '../../constants/theme';
 
@@ -64,16 +65,22 @@ export default function ResourcesScreen() {
       <View style={styles.tabBar}>
         {(
           [
-            { key: 'hotlines',      label: 'Hotlines'      },
-            { key: 'articles',      label: 'Articles'      },
-            { key: 'organisations', label: 'Organisations' },
-          ] as { key: TabName; label: string }[]
+            { key: 'hotlines',      label: 'Hotlines',      icon: 'call-outline'         },
+            { key: 'articles',      label: 'Articles',      icon: 'book-outline'         },
+            { key: 'organisations', label: 'Orgs',          icon: 'business-outline'     },
+          ] as { key: TabName; label: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[]
         ).map((tab) => (
           <TouchableOpacity
             key={tab.key}
             style={[styles.tab, activeTab === tab.key && styles.tabActive]}
             onPress={() => setActiveTab(tab.key)}
           >
+            <Ionicons
+              name={tab.icon}
+              size={15}
+              color={activeTab === tab.key ? '#fff' : theme.colors.textSecondary}
+              style={{ marginBottom: 2 }}
+            />
             <Text
               style={[
                 styles.tabText,
@@ -103,24 +110,24 @@ export default function ResourcesScreen() {
                   {REGION_FLAGS[region]} {region}
                 </Text>
                 {list.map((h, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    style={styles.hotlineCard}
-                    onPress={() => callNumber(h.number)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Call ${h.name}`}
-                  >
+                  <View key={i} style={styles.hotlineCard}>
                     <View style={styles.hotlineLeft}>
                       <Text style={styles.hotlineName}>{h.name}</Text>
                       {h.note && (
                         <Text style={styles.hotlineNote}>{h.note}</Text>
                       )}
-                    </View>
-                    <View style={styles.hotlineRight}>
                       <Text style={styles.hotlineNumber}>{h.number}</Text>
-                      <Text style={styles.callText}>Tap to call / text</Text>
                     </View>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.callBtn}
+                      onPress={() => callNumber(h.number)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Call ${h.name}`}
+                    >
+                      <Ionicons name="call" size={16} color="#fff" />
+                      <Text style={styles.callBtnText}>Call</Text>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             ))}
@@ -212,12 +219,14 @@ const styles = StyleSheet.create({
 
   sectionNote: {
     ...theme.typography.caption,
-    color: theme.colors.error,
-    backgroundColor: theme.colors.error + '10',
+    color: '#92400E',
+    backgroundColor: theme.colors.warning + '22',
     padding: theme.spacing.sm,
     borderRadius: theme.borderRadius.sm,
     marginBottom: theme.spacing.md,
     textAlign: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.warning + '44',
   },
 
   regionSection: { marginBottom: theme.spacing.lg },
@@ -242,9 +251,18 @@ const styles = StyleSheet.create({
   hotlineLeft:   { flex: 1, marginRight: theme.spacing.sm },
   hotlineName:   { ...theme.typography.body, color: theme.colors.text, fontWeight: '600' },
   hotlineNote:   { ...theme.typography.small, color: theme.colors.textSecondary, marginTop: 2 },
-  hotlineRight:  { alignItems: 'flex-end' },
-  hotlineNumber: { ...theme.typography.caption, color: theme.colors.primary, fontWeight: '700' },
-  callText:      { ...theme.typography.small, color: theme.colors.textLight, marginTop: 2 },
+  hotlineNumber: { ...theme.typography.small, color: theme.colors.primary, fontWeight: '700', marginTop: 4 },
+  callBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    ...theme.shadows.small,
+  },
+  callBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
 
   articleCard: {
     backgroundColor: theme.colors.surface,

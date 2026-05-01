@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 import { theme } from '../constants/theme';
 import type { JournalEntry } from '../types';
@@ -12,6 +13,14 @@ const MOOD_EMOJI: Record<number, string> = {
   5: '😊',
 };
 
+const MOOD_LABEL: Record<number, string> = {
+  1: 'Very Low',
+  2: 'Low',
+  3: 'Okay',
+  4: 'Good',
+  5: 'Great',
+};
+
 interface Props {
   entry: JournalEntry;
   onPress?: () => void;
@@ -19,9 +28,11 @@ interface Props {
 }
 
 export default function JournalEntryCard({ entry, onPress, onDelete }: Props) {
-  const preview = entry.content.length > 120
-    ? entry.content.slice(0, 120) + '…'
+  const preview = entry.content.length > 130
+    ? entry.content.slice(0, 130) + '…'
     : entry.content;
+
+  const moodColor = theme.colors.mood[entry.mood];
 
   return (
     <TouchableOpacity
@@ -31,22 +42,25 @@ export default function JournalEntryCard({ entry, onPress, onDelete }: Props) {
       accessibilityRole="button"
     >
       {/* Left mood stripe */}
-      <View style={[styles.stripe, { backgroundColor: theme.colors.mood[entry.mood] }]} />
+      <View style={[styles.stripe, { backgroundColor: moodColor }]} />
 
       <View style={styles.body}>
         {/* Header row */}
         <View style={styles.header}>
-          <Text style={styles.emoji}>{MOOD_EMOJI[entry.mood]}</Text>
-          <Text style={styles.date}>{dayjs(entry.date).format('ddd, D MMM YYYY')}</Text>
+          <View style={[styles.moodBadge, { backgroundColor: moodColor + '20' }]}>
+            <Text style={styles.emoji}>{MOOD_EMOJI[entry.mood]}</Text>
+            <Text style={[styles.moodLabel, { color: moodColor }]}>{MOOD_LABEL[entry.mood]}</Text>
+          </View>
+          <Text style={styles.date}>{dayjs(entry.date).format('D MMM YYYY')}</Text>
           {onDelete && (
             <TouchableOpacity
               onPress={onDelete}
               style={styles.deleteBtn}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
               accessibilityLabel="Delete entry"
             >
-              <Text style={styles.deleteText}>✕</Text>
+              <Ionicons name="trash-outline" size={15} color={theme.colors.textLight} />
             </TouchableOpacity>
           )}
         </View>
@@ -84,28 +98,38 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     padding: theme.spacing.md,
+    paddingLeft: 14,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
+    gap: 8,
+  },
+  moodBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: theme.borderRadius.full,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    gap: 4,
   },
   emoji: {
-    fontSize: 18,
-    marginRight: 8,
+    fontSize: 14,
+  },
+  moodLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
   date: {
     flex: 1,
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    fontWeight: '500',
+    ...theme.typography.small,
+    color: theme.colors.textLight,
+    textAlign: 'right',
   },
   deleteBtn: {
-    padding: 4,
-  },
-  deleteText: {
-    fontSize: 14,
-    color: theme.colors.textLight,
+    padding: 2,
   },
   content: {
     ...theme.typography.body,
@@ -116,10 +140,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    marginTop: 8,
+    marginTop: 10,
   },
   tag: {
-    backgroundColor: theme.colors.primary + '18',
+    backgroundColor: theme.colors.primarySoft,
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: 10,
     paddingVertical: 3,
@@ -127,5 +151,6 @@ const styles = StyleSheet.create({
   tagText: {
     ...theme.typography.small,
     color: theme.colors.primaryDark,
+    fontWeight: '500',
   },
 });

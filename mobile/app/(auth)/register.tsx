@@ -65,8 +65,10 @@ export default function RegisterScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
+        {/* Decorative header */}
         <View style={styles.header}>
+          <View style={styles.circle1} />
+          <View style={styles.circle2} />
           <Text style={styles.logo}>🌿</Text>
           <Text style={styles.appName}>Serein</Text>
           <Text style={styles.tagline}>Let's set up your safe space.</Text>
@@ -165,14 +167,34 @@ const styles = StyleSheet.create({
 
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical:   theme.spacing.xl,
+    paddingBottom: theme.spacing.xxl,
   },
 
   header: {
     alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.primarySoft,
+    overflow: 'hidden',
     marginBottom: theme.spacing.lg,
+  },
+  circle1: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: theme.colors.primary + '25',
+    top: -80,
+    right: -60,
+  },
+  circle2: {
+    position: 'absolute',
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: theme.colors.secondary + '30',
+    bottom: -50,
+    left: -40,
   },
   logo:    { fontSize: 44, marginBottom: 8 },
   appName: { ...theme.typography.h1, color: theme.colors.primary, letterSpacing: 1 },
@@ -182,6 +204,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.lg,
+    marginHorizontal: theme.spacing.lg,
     ...theme.shadows.medium,
   },
   title: { ...theme.typography.h2, color: theme.colors.text, marginBottom: theme.spacing.md },
@@ -206,17 +229,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 14,
     ...theme.typography.body,
     color: theme.colors.text,
   },
 
   button: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: 14,
+    borderRadius: theme.borderRadius.xl,
+    paddingVertical: 16,
     alignItems: 'center',
     marginTop: theme.spacing.lg,
+    ...theme.shadows.colored,
   },
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.3 },
@@ -225,6 +249,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: theme.spacing.lg,
+    marginHorizontal: theme.spacing.lg,
   },
   footerText: { ...theme.typography.caption, color: theme.colors.textSecondary },
   link:       { ...theme.typography.caption, color: theme.colors.primary, fontWeight: '600' },

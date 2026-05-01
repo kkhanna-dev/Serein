@@ -53,8 +53,10 @@ export default function LoginScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
+        {/* Decorative header */}
         <View style={styles.header}>
+          <View style={styles.circle1} />
+          <View style={styles.circle2} />
           <Text style={styles.logo}>🌿</Text>
           <Text style={styles.appName}>Serein</Text>
           <Text style={styles.tagline}>Your safe space, always within reach.</Text>
@@ -122,13 +124,34 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical:   theme.spacing.xxl,
+    paddingBottom: theme.spacing.xxl,
   },
 
   header: {
     alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.primarySoft,
+    overflow: 'hidden',
     marginBottom: theme.spacing.xl,
+  },
+  circle1: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: theme.colors.primary + '25',
+    top: -80,
+    right: -60,
+  },
+  circle2: {
+    position: 'absolute',
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: theme.colors.secondary + '30',
+    bottom: -50,
+    left: -40,
   },
   logo: { fontSize: 52, marginBottom: 8 },
   appName: {
@@ -147,6 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.lg,
+    marginHorizontal: theme.spacing.lg,
     ...theme.shadows.medium,
   },
   title: {
@@ -168,17 +192,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 14,
     ...theme.typography.body,
     color: theme.colors.text,
   },
 
   button: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: 14,
+    borderRadius: theme.borderRadius.xl,
+    paddingVertical: 16,
     alignItems: 'center',
     marginTop: theme.spacing.lg,
+    ...theme.shadows.colored,
   },
   buttonDisabled: { opacity: 0.7 },
   buttonText: {
@@ -192,6 +217,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: theme.spacing.lg,
+    marginHorizontal: theme.spacing.lg,
   },
   footerText: {
     ...theme.typography.caption,

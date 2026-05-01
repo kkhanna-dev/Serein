@@ -12,6 +12,7 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useChatStore } from '../../store/chatStore';
 import { theme }        from '../../constants/theme';
 import type { ChatMessage } from '../../types';
@@ -100,9 +101,17 @@ export default function ChatScreen() {
       >
         {/* ── Header ─────────────────────────────────────────────────── */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>🌿 Serein</Text>
-            <Text style={styles.headerSubtitle}>Here for you, always.</Text>
+          <View style={styles.headerLeft}>
+            <View style={styles.headerAvatar}>
+              <Text style={styles.headerAvatarText}>🌿</Text>
+            </View>
+            <View>
+              <Text style={styles.headerTitle}>Serein</Text>
+              <View style={styles.onlineRow}>
+                <View style={styles.onlineDot} />
+                <Text style={styles.headerSubtitle}>Online • Here for you</Text>
+              </View>
+            </View>
           </View>
           <TouchableOpacity
             style={styles.newChatBtn}
@@ -155,7 +164,7 @@ export default function ChatScreen() {
           >
             {isSending
               ? <ActivityIndicator color="#fff" size="small" />
-              : <Text style={styles.sendIcon}>↑</Text>
+              : <Ionicons name="arrow-up" size={20} color="#fff" />
             }
           </TouchableOpacity>
         </View>
@@ -173,13 +182,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: 10,
     backgroundColor: theme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    ...theme.shadows.small,
   },
-  headerTitle:    { ...theme.typography.h3, color: theme.colors.text },
-  headerSubtitle: { ...theme.typography.small, color: theme.colors.textSecondary },
+  headerLeft:       { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  headerAvatar:     {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.primarySoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerAvatarText: { fontSize: 20 },
+  headerTitle:      { ...theme.typography.h3, color: theme.colors.text },
+  onlineRow:        { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
+  onlineDot:        { width: 7, height: 7, borderRadius: 4, backgroundColor: theme.colors.success },
+  headerSubtitle:   { ...theme.typography.small, color: theme.colors.textSecondary },
   newChatBtn:     {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -252,7 +272,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: theme.colors.textLight,
+    backgroundColor: theme.colors.primary + 'bb',
   },
 
   inputBar: {
@@ -286,5 +306,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sendBtnDisabled: { backgroundColor: theme.colors.textLight },
-  sendIcon: { color: '#fff', fontSize: 20, fontWeight: '700', marginTop: -2 },
 });

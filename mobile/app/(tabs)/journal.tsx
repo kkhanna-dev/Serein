@@ -14,6 +14,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useJournalStore } from '../../store/journalStore';
 import JournalEntryCard    from '../../components/JournalEntryCard';
 import MoodPicker          from '../../components/MoodPicker';
@@ -156,7 +157,7 @@ export default function JournalScreen() {
         accessibilityRole="button"
         accessibilityLabel="New journal entry"
       >
-        <Text style={styles.fabText}>＋</Text>
+        <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
 
       {/* ── New entry modal ──────────────────────────────────────────── */}
@@ -167,6 +168,7 @@ export default function JournalScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <SafeAreaView style={styles.modalSafe} edges={['top', 'bottom']}>
+          <View style={styles.modalHandle} />
           <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -305,10 +307,18 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...theme.shadows.large,
+    ...theme.shadows.colored,
   },
-  fabText: { color: '#fff', fontSize: 28, lineHeight: 30, marginTop: -2 },
 
+  modalHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: theme.colors.textLight,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 4,
+  },
   // ── Modal ─────────────────────────────────────────────────────────────────
   modalSafe:    { flex: 1, backgroundColor: theme.colors.background },
   modalContent: { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.xxl },
